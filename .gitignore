@@ -1,0 +1,13 @@
+*.py[cod]
+*.egg-info
+__pycache__
+
+/navx/version.py
+
+/docs/_build
+/docs/_sidebar.rst.inc
+
+.cache
+.coverage
+build
+dist

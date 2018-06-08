@@ -1,0 +1,5 @@
+[git-source-track]
+validation_root = navx
+exclude_commits_file = .gittrackexclude
+upstream_root = ../navxmxp
+upstream_commit = 09abe90221cb9d0ae104776af037d0b8a7f2d720
