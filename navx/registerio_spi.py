@@ -14,7 +14,7 @@ DEFAULT_SPI_BITRATE_HZ = 500000
 import threading
 
 import hal
-from robotpy_ext.misc.crc7 import crc7
+from ._impl.crc7 import crc7
 from wpilib import SPI, Timer
 
 import logging

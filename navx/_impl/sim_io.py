@@ -10,7 +10,7 @@ from hal_impl.data import hal_data
 from hal_impl.i2c_helpers import I2CSimBase
 from hal_impl.spi_helpers import SPISimBase
 
-from ....misc.crc7 import crc7
+from .crc7 import crc7
 
 class NavXSimBase:
     """
@@ -92,4 +92,3 @@ class NavXSPISim(NavXSimBase, SPISimBase):
         # TODO: maybe disable crc in sim
         dataReceived[-1] = crc7(dataReceived[:-1])
         return size
-
