@@ -89,5 +89,5 @@ class RegisterIO_SPI:
     def shutdown(self):
         # TODO: should free?
         logger.info("NavX i2c shutdown")
-        self.port.free()
+        self.port.close()
         return True

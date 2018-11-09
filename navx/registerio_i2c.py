@@ -66,5 +66,5 @@ class RegisterIO_I2C:
     
     def shutdown(self):
         logger.info("NavX i2c shutdown")
-        self.port.free()
+        self.port.close()
         return True
