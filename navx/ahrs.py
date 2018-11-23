@@ -185,7 +185,7 @@ class AHRS(wpilib.SensorBase):
         wpilib.Resource._add_global_resource(self)
     
     
-    def free(self):
+    def close(self):
         self.io.stop()
         try:
             self.ioThread.join(timeout=5)
