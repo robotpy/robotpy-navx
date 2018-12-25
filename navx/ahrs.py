@@ -33,7 +33,7 @@ __all__ = ['AHRS']
 DEV_UNITS_MAX = 32768.0
 UTESLA_PER_DEV_UNIT = 0.15
 
-class AHRS(wpilib.SensorBase):
+class AHRS(wpilib.SendableBase):
     """The AHRS class provides an interface to AHRS capabilities
     of the KauaiLabs navX Robotics Navigation Sensor via SPI and I2C
     communications interfaces on the RoboRIO.
@@ -1080,4 +1080,4 @@ class AHRS(wpilib.SensorBase):
 
     def initSendable(self, builder):
         builder.setSmartDashboardType("Gyro")
-        builder.addDoubleProperty("Value", self.getAngle, None)
+        builder.addDoubleProperty("Value", self.getYaw, None)
