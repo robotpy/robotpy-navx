@@ -1,5 +1,5 @@
 # validated: 2018-02-11 DV d8fa37624f03 roborio/java/navx_frc/src/com/kauailabs/navx/frc/AHRS.java
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Copyright (c) Kauai Labs 2015. All Rights Reserved.
 #
 # Created in support of Team 2465 (Kauaibots).  Go Purple Wave!
@@ -7,7 +7,7 @@
 # Open Source Software - may be modified and shared by FRC teams. Any
 # modifications to this code must be accompanied by the \License.txt file
 # in the root directory of the project
-#----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 
 import threading
 
@@ -25,13 +25,15 @@ from .registerio_i2c import RegisterIO_I2C
 from .registerio_spi import RegisterIO_SPI
 
 import logging
-logger = logging.getLogger('navx')
 
-__all__ = ['AHRS']
+logger = logging.getLogger("navx")
+
+__all__ = ["AHRS"]
 
 
 DEV_UNITS_MAX = 32768.0
 UTESLA_PER_DEV_UNIT = 0.15
+
 
 class AHRS(wpilib.SendableBase):
     """The AHRS class provides an interface to AHRS capabilities
@@ -52,16 +54,18 @@ class AHRS(wpilib.SendableBase):
     .. note:: This implementation does not provide access to the NavX via
               a serial port
     """
-    
-    NAVX_DEFAULT_UPDATE_RATE_HZ         = 60
-    YAW_HISTORY_LENGTH                  = 10
-    DEFAULT_ACCEL_FSR_G                 = 2
-    DEFAULT_GYRO_FSR_DPS                = 2000
-    
+
+    NAVX_DEFAULT_UPDATE_RATE_HZ = 60
+    YAW_HISTORY_LENGTH = 10
+    DEFAULT_ACCEL_FSR_G = 2
+    DEFAULT_GYRO_FSR_DPS = 2000
+
     PIDSourceType = PIDSource.PIDSourceType
-    
+
     @classmethod
-    def create_spi(cls, port=wpilib.SPI.Port.kMXP, spi_bitrate=None, update_rate_hz=None):
+    def create_spi(
+        cls, port=wpilib.SPI.Port.kMXP, spi_bitrate=None, update_rate_hz=None
+    ):
         """Constructs the AHRS class using SPI communication, overriding the 
         default update rate with a custom rate which may be from 4 to 100, 
         representing the number of updates per second sent by the sensor.  
@@ -75,10 +79,10 @@ class AHRS(wpilib.SendableBase):
         :param spi_bitrate: SPI bitrate (Maximum:  2,000,000)
         :param update_rate_hz: Custom Update Rate (Hz)
         """
-        
+
         io = RegisterIO_SPI(port, spi_bitrate)
         return AHRS(io, update_rate_hz)
-    
+
     @classmethod
     def create_i2c(cls, port=wpilib.I2C.Port.kMXP, update_rate_hz=None):
         """Constructs the AHRS class using I2C communication, overriding the
@@ -93,21 +97,21 @@ class AHRS(wpilib.SendableBase):
         :type port: :class:`.I2C.Port`
         :param update_rate_hz: Custom Update Rate (Hz)
         """
-        
+
         io = RegisterIO_I2C(port)
         return AHRS(io, update_rate_hz)
-    
+
     def __init__(self, io, update_rate_hz=None):
         """Don't use the constructor, use the :meth:`create_spi` or
         :meth:`create_i2c` class methods instead"""
-        
+
         if update_rate_hz is None:
             update_rate_hz = self.NAVX_DEFAULT_UPDATE_RATE_HZ
 
         super().__init__(addLiveWindow=False)
 
         # Internal variables
-        
+
         self.yaw = 0
         self.pitch = 0
         self.roll = 0
@@ -119,25 +123,25 @@ class AHRS(wpilib.SendableBase):
         self.fused_heading = 0
         self.altitude = 0
         self.baro_pressure = 0
-        #self.is_moving = False
-        #self.is_rotating = False
+        # self.is_moving = False
+        # self.is_rotating = False
         self.baro_sensor_temp_c = 0
-        #self.altitude_valid = False
-        #self.is_magnetometer_calibrated = False
-        #self.magnetic_disturbance = False
+        # self.altitude_valid = False
+        # self.is_magnetometer_calibrated = False
+        # self.magnetic_disturbance = False
         self.quaternionW = 0
         self.quaternionX = 0
         self.quaternionY = 0
-        self.quaternionZ = 0       
-        
-        # Integrated Data 
+        self.quaternionZ = 0
+
+        # Integrated Data
         self.vel_x = 0
         self.vel_y = 0
         self.vel_z = 0
         self.disp_x = 0
         self.disp_y = 0
         self.disp_z = 0
-        
+
         # Raw Data
         self.raw_gyro_x = 0
         self.raw_gyro_y = 0
@@ -148,74 +152,77 @@ class AHRS(wpilib.SendableBase):
         self.cal_mag_x = 0
         self.cal_mag_y = 0
         self.cal_mag_z = 0
-        
+
         # Configuration/Status
         self.update_rate_hz = update_rate_hz
         self.accel_fsr_g = self.DEFAULT_ACCEL_FSR_G
         self.gyro_fsr_dps = self.DEFAULT_GYRO_FSR_DPS
-        self.capability_flags = 0    
+        self.capability_flags = 0
         self.op_status = 0
         self.sensor_status = 0
         self.cal_status = 0
         self.selftest_status = 0
-        
-        # Board ID 
+
+        # Board ID
         self.board_type = 0
         self.hw_rev = 0
         self.fw_ver_major = 0
         self.fw_ver_minor = 0
-        
+
         self.last_sensor_timestamp = 0
         self.last_update_time = 0
-        
+
         self.pidSource = self.PIDSourceType.kDisplacement
-        
+
         self.integrator = InertialDataIntegrator()
         self.yaw_offset_tracker = OffsetTracker(self.YAW_HISTORY_LENGTH)
         self.yaw_angle_tracker = ContinuousAngleTracker()
         self.callbacks = []
-        
+
         self.io = RegisterIO(io, self.update_rate_hz, self, self)
-        self.ioThread = threading.Thread(target=self.io.run, name='NavX',
-                                         daemon=True)
-        
+        self.ioThread = threading.Thread(target=self.io.run, name="NavX", daemon=True)
+
         self.ioThread.start()
-        
+
         # Need this to free on unit test wpilib reset
         wpilib.Resource._add_global_resource(self)
-    
-    
+
     def close(self):
         self.io.stop()
         try:
             self.ioThread.join(timeout=5)
         finally:
             self.io.shutdown()
-    
+
     # calculated properties
     @property
     def is_moving(self):
         return (self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_MOVING) != 0
-    
+
     @property
     def is_rotating(self):
         return (self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_YAW_STABLE) == 0
-    
+
     @property
     def altitude_valid(self):
-        return (self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_ALTITUDE_VALID) != 0
-    
+        return (
+            self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_ALTITUDE_VALID
+        ) != 0
+
     @property
     def is_magnetometer_calibrated(self):
         return (self.sensor_status & AHRSProtocol.NAVX_CAL_STATUS_MAG_CAL_COMPLETE) != 0
-    
+
     @property
     def magnetic_disturbance(self):
-        return (self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_MAG_DISTURBANCE) != 0
+        return (
+            self.sensor_status & AHRSProtocol.NAVX_SENSOR_STATUS_MAG_DISTURBANCE
+        ) != 0
+
     #
     # Public API
     #
-    
+
     def getPitch(self):
         """Returns the current pitch value (in degrees, from -180 to 180)
         reported by the sensor.  Pitch is a measure of rotation around
@@ -225,7 +232,6 @@ class AHRS(wpilib.SendableBase):
         """
         return self.pitch
 
-    
     def getRoll(self):
         """Returns the current roll value (in degrees, from -180 to 180)
         reported by the sensor.  Roll is a measure of rotation around
@@ -282,7 +288,7 @@ class AHRS(wpilib.SendableBase):
             self.yaw_offset_tracker.setOffset()
             # Notification occurs immediately.
             self._yawResetComplete()
-    
+
     def isCalibrating(self):
         """Returns true if the sensor is currently performing automatic
         gyro/accelerometer calibration.  Automatic calibration occurs
@@ -299,10 +305,10 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns true if the sensor is currently automatically
                   calibrating the gyro and accelerometer sensors.
         """
-        return (self.cal_status & \
-                    AHRSProtocol.NAVX_CAL_STATUS_IMU_CAL_STATE_MASK) != \
-                        AHRSProtocol.NAVX_CAL_STATUS_IMU_CAL_COMPLETE
-                        
+        return (
+            self.cal_status & AHRSProtocol.NAVX_CAL_STATUS_IMU_CAL_STATE_MASK
+        ) != AHRSProtocol.NAVX_CAL_STATUS_IMU_CAL_COMPLETE
+
     def isConnected(self):
         """Indicates whether the sensor is currently connected
         to the host computer.  A connection is considered established
@@ -312,7 +318,7 @@ class AHRS(wpilib.SendableBase):
                   from the sensor.
         """
         return self.io.isConnected()
-    
+
     def getByteCount(self):
         """Returns the count in bytes of data received from the
         sensor. This could can be useful for diagnosing
@@ -325,7 +331,7 @@ class AHRS(wpilib.SendableBase):
         :returns: The number of bytes received from the sensor.
         """
         return self.io.getByteCount()
-    
+
     def getActualUpdateRate(self):
         """Returns the navX-Model device's currently configured update
         rate.  Note that the update rate that can actually be realized
@@ -342,16 +348,19 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current actual update rate in Hz
         (cycles per second).
         """
-        actual_update_rate = self._getActualUpdateRateInternal(self.getRequestedUpdateRate())
+        actual_update_rate = self._getActualUpdateRateInternal(
+            self.getRequestedUpdateRate()
+        )
         return int(actual_update_rate & 0xFF)
-    
+
     def _getActualUpdateRateInternal(self, update_rate):
         NAVX_MOTION_PROCESSOR_UPDATE_RATE_HZ = 200
         integer_update_rate = int(update_rate & 0xFF)
-        realized_update_rate = NAVX_MOTION_PROCESSOR_UPDATE_RATE_HZ / \
-                (NAVX_MOTION_PROCESSOR_UPDATE_RATE_HZ / integer_update_rate)
+        realized_update_rate = NAVX_MOTION_PROCESSOR_UPDATE_RATE_HZ / (
+            NAVX_MOTION_PROCESSOR_UPDATE_RATE_HZ / integer_update_rate
+        )
         return realized_update_rate
-    
+
     def getRequestedUpdateRate(self):
         """Returns the currently requested update rate.
         rate.  Note that not every update rate can actually be realized,
@@ -365,7 +374,7 @@ class AHRS(wpilib.SendableBase):
         (cycles per second).
         """
         return int(self.update_rate_hz & 0xFF)
-    
+
     def getUpdateCount(self):
         """Returns the count of valid updates which have
         been received from the sensor.  This count should increase
@@ -373,9 +382,9 @@ class AHRS(wpilib.SendableBase):
         
         :returns: The number of valid updates received from the sensor.
         """
-       
+
         return self.io.getUpdateCount()
-    
+
     def getLastSensorTimestamp(self):
         """Returns the sensor timestamp corresponding to the
         last sample retrieved from the sensor.  Note that this
@@ -389,7 +398,7 @@ class AHRS(wpilib.SendableBase):
         :rtype: int
         """
         return self.last_sensor_timestamp
-    
+
     def getWorldLinearAccelX(self):
         """Returns the current linear acceleration in the X-axis (in G).
         
@@ -402,7 +411,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Current world linear acceleration in the X-axis (in G).
         """
         return self.world_linear_accel_x
-    
+
     def getWorldLinearAccelY(self):
         """Returns the current linear acceleration in the Y-axis (in G).
         
@@ -415,7 +424,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Current world linear acceleration in the Y-axis (in G).
         """
         return self.world_linear_accel_y
-    
+
     def getWorldLinearAccelZ(self):
         """Returns the current linear acceleration in the Z-axis (in G).
         
@@ -428,7 +437,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Current world linear acceleration in the Z-axis (in G).
         """
         return self.world_linear_accel_z
-    
+
     def isMoving(self):
         """Indicates if the sensor is currently detecting motion,
         based upon the X and Y-axis world linear acceleration values.
@@ -438,7 +447,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns true if the sensor is currently detecting motion.
         """
         return self.is_moving
-    
+
     def isRotating(self):
         """Indicates if the sensor is currently detecting motion,
         based upon the X and Y-axis world linear acceleration values.
@@ -448,7 +457,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns true if the sensor is currently detecting motion.
         """
         return self.is_rotating
-    
+
     def getBarometricPressure(self):
         """Returns the current barometric pressure, based upon calibrated readings
         from the onboard pressure sensor.  This value is in units of millibar.
@@ -473,7 +482,7 @@ class AHRS(wpilib.SendableBase):
                   an installed on-board pressure sensor).
         """
         return self.altitude
-    
+
     def isAltitudeValid(self):
         """Indicates whether the current altitude (and barometric pressure) data is
         valid. This value will only be true for a sensor with an onboard
@@ -485,7 +494,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns true if a working pressure sensor is installed.
         """
         return self.altitude_valid
-    
+
     def getFusedHeading(self):
         """Returns the "fused" (9-axis) heading.
         
@@ -503,7 +512,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Fused Heading in Degrees (range 0-360)
         """
         return self.fused_heading
-    
+
     def isMagneticDisturbance(self):
         """Indicates whether the current magnetic field strength diverges from the
         calibrated value for the earth's magnetic field by more than the currently-
@@ -515,7 +524,7 @@ class AHRS(wpilib.SendableBase):
         :returns: true if a magnetic disturbance is detected (or the magnetometer is uncalibrated).
         """
         return self.magnetic_disturbance
-    
+
     def isMagnetometerCalibrated(self):
         """Indicates whether the magnetometer has been calibrated.
         
@@ -528,11 +537,11 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns true if magnetometer calibration has been performed.
         """
         return self.is_magnetometer_calibrated
-    
+
     #
     # Unit Quaternions
     #
-    
+
     def getQuaternionW(self):
         """Returns the imaginary portion (W) of the Orientation Quaternion which
         fully describes the current sensor orientation with respect to the
@@ -547,7 +556,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the imaginary portion (W) of the quaternion.
         """
         return self.quaternionW
-    
+
     def getQuaternionX(self):
         """Returns the real portion (X axis) of the Orientation Quaternion which
         fully describes the current sensor orientation with respect to the
@@ -562,7 +571,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the real portion (X) of the quaternion.
         """
         return self.quaternionX
-    
+
     def getQuaternionY(self):
         """Returns the real portion (Y axis) of the Orientation Quaternion which
         fully describes the current sensor orientation with respect to the
@@ -579,7 +588,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the real portion (X) of the quaternion.
         """
         return self.quaternionY
-    
+
     def getQuaternionZ(self):
         """Returns the real portion (Z axis) of the Orientation Quaternion which
         fully describes the current sensor orientation with respect to the
@@ -596,7 +605,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the real portion (X) of the quaternion.
         """
         return self.quaternionZ
-    
+
     def resetDisplacement(self):
         """Zeros the displacement integration variables.   Invoke this at the moment when
         integration begins.
@@ -605,16 +614,17 @@ class AHRS(wpilib.SendableBase):
             self.io.zeroDisplacement()
         else:
             self.integrator.resetDisplacement()
-    
-    def _updateDisplacement(self, accel_x_g, accel_y_g, 
-                            update_rate_hz, is_moving):
+
+    def _updateDisplacement(self, accel_x_g, accel_y_g, update_rate_hz, is_moving):
         """Each time new linear acceleration samples are received, this function should be invoked.
         This function transforms acceleration in G to meters/sec^2, then converts this value to
         Velocity in meters/sec (based upon velocity in the previous sample).  Finally, this value
         is converted to displacement in meters, and integrated.
         """
-        self.integrator.updateDisplacement(accel_x_g, accel_y_g, update_rate_hz, is_moving)
-    
+        self.integrator.updateDisplacement(
+            accel_x_g, accel_y_g, update_rate_hz, is_moving
+        )
+
     def getVelocityX(self):
         """Returns the velocity (in meters/sec) of the X axis [Experimental].
         
@@ -628,7 +638,7 @@ class AHRS(wpilib.SendableBase):
             return self.vel_x
         else:
             return self.integrator.getVelocityX()
-    
+
     def getVelocityY(self):
         """Returns the velocity (in meters/sec) of the Y axis [Experimental].
         
@@ -642,7 +652,7 @@ class AHRS(wpilib.SendableBase):
             return self.vel_y
         else:
             return self.integrator.getVelocityY()
-    
+
     def getVelocityZ(self):
         """Returns the velocity (in meters/sec) of the X axis [Experimental].
         
@@ -656,9 +666,7 @@ class AHRS(wpilib.SendableBase):
             return self.vel_z
         else:
             return self.integrator.getVelocityZ()
-    
 
-    
     def getDisplacementX(self):
         """Returns the displacement (in meters) of the X axis since resetDisplacement()
         was last invoked [Experimental].
@@ -674,9 +682,7 @@ class AHRS(wpilib.SendableBase):
             return self.disp_x
         else:
             return self.integrator.getDisplacementX()
-        
-    
-    
+
     def getDisplacementY(self):
         """Returns the displacement (in meters) of the Y axis since resetDisplacement()
         was last invoked [Experimental].
@@ -692,7 +698,7 @@ class AHRS(wpilib.SendableBase):
             return self.disp_y
         else:
             return self.integrator.getDisplacementY()
-        
+
     def getDisplacementZ(self):
         """Returns the displacement (in meters) of the Z axis since resetDisplacement()
         was last invoked [Experimental].
@@ -708,7 +714,7 @@ class AHRS(wpilib.SendableBase):
             return self.disp_z
         else:
             return self.integrator.getDisplacementZ()
-    
+
     def registerCallback(self, callback):
         """Registers a callback interface.  This interface
         will be called back when new data is available,
@@ -734,12 +740,11 @@ class AHRS(wpilib.SendableBase):
             return True
         except ValueError:
             return False
-    
-    #**********************************************************
+
+    # **********************************************************
     # PIDSource Interface Implementation
-    #**********************************************************
-    
-    
+    # **********************************************************
+
     def pidGet(self):
         """Returns the current value to use for PID, based on the PIDSourceType.
         
@@ -757,13 +762,13 @@ class AHRS(wpilib.SendableBase):
             return self.getRate()
         else:
             return 0.0
-    
+
     def setPIDSourceType(self, pidSource):
         self.pidSource = pidSource
-    
+
     def getPIDSourceType(self):
         return self.pidSource
-    
+
     def getAngle(self):
         """Returns the total accumulated yaw angle (Z Axis, in degrees)
         reported by the sensor.
@@ -781,7 +786,7 @@ class AHRS(wpilib.SendableBase):
                   from the Z-axis (yaw) gyro.
         """
         return self.yaw_angle_tracker.getAngle()
-    
+
     def getRate(self):
         """Return the rate of rotation of the yaw (Z-axis) gyro, in degrees per second.
         
@@ -790,7 +795,7 @@ class AHRS(wpilib.SendableBase):
         :returns: The current rate of change in yaw angle (in degrees per second)
         """
         return self.yaw_angle_tracker.getRate()
-    
+
     def setAngleAdjustment(self, adjustment):
         """Sets an amount of angle to be automatically added before returning a
         angle from the :meth:`getAngle` method.  This allows users of the ``getAngle`` method
@@ -808,7 +813,7 @@ class AHRS(wpilib.SendableBase):
         :param adjustment: in degrees (range:  -360 to 360)
         """
         self.yaw_angle_tracker.setAngleAdjustment(adjustment)
-    
+
     def getAngleAdjustment(self):
         """Returns the currently configured adjustment angle.  See
         :meth:`setAngleAdjustment` for more details.
@@ -818,7 +823,7 @@ class AHRS(wpilib.SendableBase):
         :returns: adjustment, in degrees (range:  -360 to 360)
         """
         return self.yaw_angle_tracker.getAngleAdjustment()
-    
+
     def reset(self):
         """Reset the Yaw gyro.
         
@@ -827,7 +832,7 @@ class AHRS(wpilib.SendableBase):
         after it has been running.
         """
         self.zeroYaw()
-    
+
     def getRawGyroX(self):
         """Returns the current raw (unprocessed) X-axis gyro rotation rate (in degrees/sec).
         
@@ -838,7 +843,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current rotation rate (in degrees/sec).
         """
         return self.raw_gyro_x / (DEV_UNITS_MAX / self.gyro_fsr_dps)
-    
+
     def getRawGyroY(self):
         """Returns the current raw (unprocessed) Y-axis gyro rotation rate (in degrees/sec).
         
@@ -849,7 +854,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current rotation rate (in degrees/sec).
         """
         return self.raw_gyro_y / (DEV_UNITS_MAX / self.gyro_fsr_dps)
-    
+
     def getRawGyroZ(self):
         """Returns the current raw (unprocessed) Z-axis gyro rotation rate (in degrees/sec).
         
@@ -860,7 +865,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current rotation rate (in degrees/sec).
         """
         return self.raw_gyro_z / (DEV_UNITS_MAX / self.gyro_fsr_dps)
-    
+
     def getRawAccelX(self):
         """Returns the current raw (unprocessed) X-axis acceleration rate (in G).
         
@@ -884,7 +889,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current acceleration rate (in G).
         """
         return self.raw_accel_y / (DEV_UNITS_MAX / self.accel_fsr_g)
-    
+
     def getRawAccelZ(self):
         """Returns the current raw (unprocessed) Z-axis acceleration rate (in G).
         
@@ -896,8 +901,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the current acceleration rate (in G).
         """
         return self.raw_accel_z / (DEV_UNITS_MAX / self.accel_fsr_g)
-    
-    
+
     def getRawMagX(self):
         """Returns the current raw (unprocessed) X-axis magnetometer reading (in uTesla).
         
@@ -921,7 +925,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the mag field strength (in uTesla).
         """
         return self.cal_mag_y / UTESLA_PER_DEV_UNIT
-    
+
     def getRawMagZ(self):
         """Returns the current raw (unprocessed) Z-axis magnetometer reading (in uTesla).
         
@@ -933,7 +937,7 @@ class AHRS(wpilib.SendableBase):
         :returns: Returns the mag field strength (in uTesla).
         """
         return self.cal_mag_z / UTESLA_PER_DEV_UNIT
-     
+
     def getPressure(self):
         """Returns the current barometric pressure (in millibar) [navX Aero only].
         
@@ -943,7 +947,7 @@ class AHRS(wpilib.SendableBase):
         """
         # TODO implement for navX-Aero.
         return 0
-    
+
     def getTempC(self):
         """Returns the current temperature (in degrees centigrade) reported by
         the sensor's gyro/accelerometer circuit.
@@ -954,7 +958,7 @@ class AHRS(wpilib.SendableBase):
         :returns: The current temperature (in degrees centigrade).
         """
         return self.mpu_temp_c
-    
+
     def getBoardYawAxis(self):
         """Returns information regarding which sensor board axis (X,Y or Z) and
         direction (up/down) is currently configured to report Yaw (Z) angle
@@ -972,17 +976,17 @@ class AHRS(wpilib.SendableBase):
         yaw_axis_info &= 7
         if yaw_axis_info == AHRSProtocol.OMNIMOUNT_DEFAULT:
             up = True
-            yaw_axis = 'z'
+            yaw_axis = "z"
         else:
             up = True if yaw_axis_info & 0x01 != 0 else False
             yaw_axis_info >>= 1
             if yaw_axis_info == 0:
-                yaw_axis = 'x'
+                yaw_axis = "x"
             elif yaw_axis_info == 1:
-                yaw_axis = 'y'
+                yaw_axis = "y"
             elif yaw_axis_info == 2:
-                yaw_axis = 'z'
-            
+                yaw_axis = "z"
+
         return up, yaw_axis
 
     def getFirmwareVersion(self):
@@ -995,7 +999,7 @@ class AHRS(wpilib.SendableBase):
         
         :returns: The firmware version in the format [MajorVersion].[MinorVersion]
         """
-        return '%s.%s' % (self.fw_ver_major, self.fw_ver_minor)
+        return "%s.%s" % (self.fw_ver_major, self.fw_ver_minor)
 
     def getGyroFullScaleRangeDPS(self) -> int:
         return self.gyro_fsr_dps
@@ -1006,74 +1010,84 @@ class AHRS(wpilib.SendableBase):
     #
     # Internal API
     #
-    
+
     def _isOmniMountSupported(self):
-        return (self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_OMNIMOUNT) != 0
-    
+        return (
+            self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_OMNIMOUNT
+        ) != 0
+
     def _isBoardYawResetSupported(self):
-        return (self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_YAW_RESET) != 0
-    
+        return (
+            self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_YAW_RESET
+        ) != 0
+
     def _isDisplacementSupported(self):
-        return (self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_VEL_AND_DISP) != 0
-    
+        return (
+            self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_VEL_AND_DISP
+        ) != 0
+
     def _isAHRSPosTimestampSupported(self):
-        return (self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_AHRSPOS_TS) != 0
-    
+        return (
+            self.capability_flags & AHRSProtocol.NAVX_CAPABILITY_FLAG_AHRSPOS_TS
+        ) != 0
+
     # iocomplete notification stuff
-    
+
     def _setYawPitchRoll(self, o, sensor_timestamp):
         with self.mutex:
             self.__dict__.update(o.__dict__)
             self.last_sensor_timestamp = sensor_timestamp
-    
+
     def _setAHRSPosData(self, o, sensor_timestamp):
         with self.mutex:
             self.__dict__.update(o.__dict__)
             self.last_sensor_timestamp = sensor_timestamp
-            
+
             self.yaw_offset_tracker.updateHistory(self.yaw)
             self.yaw_angle_tracker.nextAngle(self.getYaw())
-            
+
             callbacks = self.callbacks[:]
-            
+
         for callback in callbacks:
             callback(o, sensor_timestamp)
-    
+
     def _setRawData(self, o, sensor_timestamp):
         with self.mutex:
             self.__dict__.update(o.__dict__)
             self.last_sensor_timestamp = sensor_timestamp
-    
+
     def _setAHRSData(self, o, sensor_timestamp):
         with self.mutex:
             self.__dict__.update(o.__dict__)
             self.last_sensor_timestamp = sensor_timestamp
-            
+
             self.yaw_offset_tracker.updateHistory(self.yaw)
-            
-            self._updateDisplacement(o.world_linear_accel_x,
-                                     o.world_linear_accel_y,
-                                     self.update_rate_hz,
-                                     self.is_moving)
-            
+
+            self._updateDisplacement(
+                o.world_linear_accel_x,
+                o.world_linear_accel_y,
+                self.update_rate_hz,
+                self.is_moving,
+            )
+
             self.yaw_angle_tracker.nextAngle(self.getYaw())
-            
+
             callbacks = self.callbacks[:]
-            
+
         for callback in callbacks:
             callback(o, sensor_timestamp)
-    
+
     def _setBoardID(self, o):
         with self.mutex:
             self.__dict__.update(o.__dict__)
-    
+
     def _setBoardState(self, o):
         with self.mutex:
             self.__dict__.update(o.__dict__)
-            
+
     def _yawResetComplete(self):
         self.yaw_angle_tracker.reset()
-    
+
     #
     # LiveWindow
     #
