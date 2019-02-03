@@ -192,7 +192,11 @@ class RegisterIO:
         else:
             read_count = IMURegisters.NAVX_REG_QUAT_OFFSET_Z_H + 1 - first_address
 
-        curr_data = self.io_provider.read(first_address, read_count)
+        try:
+            curr_data = self.io_provider.read(first_address, read_count)
+        except IOError as e:
+            logger.warning("Error reading data, ignoring: %s", e)
+            return
 
         sensor_timestamp = AHRSProtocol.decodeBinaryUint32(
             curr_data, IMURegisters.NAVX_REG_TIMESTAMP_L_L - first_address
