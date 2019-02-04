@@ -9,11 +9,12 @@
 # in the root directory of the project
 # ----------------------------------------------------------------------------
 
-from ._impl import AHRSProtocol, IMUProtocol, IMURegisters
+import logging
+import time
 
 from wpilib.timer import Timer
 
-import logging
+from ._impl import AHRSProtocol, IMUProtocol, IMURegisters
 
 logger = logging.getLogger("navx")
 
@@ -79,6 +80,7 @@ class RegisterIO:
 
     def run(self):
         logger.info("NavX io thread starting")
+        monotonic = time.monotonic
 
         try:
             self.io_provider.init()
@@ -99,7 +101,7 @@ class RegisterIO:
                     self.board_id.fw_ver_minor,
                 )
 
-            log_error = True
+            last_read_error_ts = 0
 
             # Calculate delay to match configured update rate
             # Note:  some additional time is removed from the
@@ -120,12 +122,11 @@ class RegisterIO:
 
                 try:
                     self.getCurrentData()
-                except IOError:
-                    if log_error:
-                        logger.exception("Error getting data")
-                        log_error = False
-                else:
-                    log_error = True
+                except IOError as e:
+                    now = monotonic()
+                    if now - last_read_error_ts > 1.0:
+                        logger.error("Error reading data: %s", e)
+                        last_read_error_ts = now
 
                 Timer.delay(update_rate)
         except Exception:
