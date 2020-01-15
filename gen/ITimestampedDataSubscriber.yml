@@ -1,0 +1,7 @@
+---
+
+classes:
+  ITimestampedDataSubscriber:
+    shared_ptr: true
+    methods:
+      timestampedDataReceived:

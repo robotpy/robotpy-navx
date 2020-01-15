@@ -2,6 +2,14 @@
 *.egg-info
 __pycache__
 
+*.so
+*.dylib
+*.dll
+
+/navx/include
+/navx/rpy-include
+/navx/_init_navx.py
+/navx/pkgcfg.py
 /navx/version.py
 
 /docs/_build

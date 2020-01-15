@@ -1,0 +1,92 @@
+---
+
+inline_code: |
+  #include <src/rpy/AHRS.cpp.inl>
+
+classes:
+  AHRS:
+    shared_ptr: true
+    base_qualnames:
+      SendableBase: frc::SendableBase
+      ErrorBase: frc::SendableBase
+      PIDSource: frc::PIDSource
+    enums:
+      BoardAxis:
+      SerialDataType:
+    methods:
+      AHRS:
+        overloads:
+          SPI::Port:
+          I2C::Port:
+          SerialPort::Port:
+          SPI::Port, uint8_t:
+          SPI::Port, uint32_t, uint8_t:
+          I2C::Port, uint8_t:
+          SerialPort::Port, AHRS::SerialDataType, uint8_t:
+      GetPitch:
+      GetRoll:
+      GetYaw:
+      GetCompassHeading:
+      ZeroYaw:
+      IsCalibrating:
+      IsConnected:
+      GetByteCount:
+      GetUpdateCount:
+      GetLastSensorTimestamp:
+      GetWorldLinearAccelX:
+      GetWorldLinearAccelY:
+      GetWorldLinearAccelZ:
+      IsMoving:
+      IsRotating:
+      GetBarometricPressure:
+      GetAltitude:
+      IsAltitudeValid:
+      GetFusedHeading:
+      IsMagneticDisturbance:
+      IsMagnetometerCalibrated:
+      GetQuaternionW:
+      GetQuaternionX:
+      GetQuaternionY:
+      GetQuaternionZ:
+      ResetDisplacement:
+      UpdateDisplacement:
+      GetVelocityX:
+      GetVelocityY:
+      GetVelocityZ:
+      GetDisplacementX:
+      GetDisplacementY:
+      GetDisplacementZ:
+      GetAngle:
+      GetRate:
+      SetAngleAdjustment:
+      GetAngleAdjustment:
+      Reset:
+      GetRawGyroX:
+      GetRawGyroY:
+      GetRawGyroZ:
+      GetRawAccelX:
+      GetRawAccelY:
+      GetRawAccelZ:
+      GetRawMagX:
+      GetRawMagY:
+      GetRawMagZ:
+      GetPressure:
+      GetTempC:
+      GetBoardYawAxis:
+      GetFirmwareVersion:
+      RegisterCallback:
+        ignore: true
+      DeregisterCallback:
+        ignore: true
+      GetActualUpdateRate:
+      GetRequestedUpdateRate:
+      EnableLogging:
+      EnableBoardlevelYawReset:
+      IsBoardlevelYawResetEnabled:
+      GetGyroFullScaleRangeDPS:
+      GetAccelFullScaleRangeG:
+  AHRS::BoardYawAxis:
+    shared_ptr: true
+    attributes:
+      board_axis:
+      up:

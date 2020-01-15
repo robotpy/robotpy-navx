@@ -1,0 +1,51 @@
+[build-system]
+requires = [
+    "robotpy-build>=2020.0.12,<2021.0.0",
+    "robotpy-wpilib>=2020.1.2.2,<2021.0.0",
+]
+
+[tool.robotpy-build]
+base_package = "navx"
+
+[tool.robotpy-build.wrappers."navx".maven_lib_download]
+artifact_id = "navx-cpp"
+group_id = "com.kauailabs.navx.frc"
+repo_url = "https://repo1.maven.org/maven2"
+version = "3.1.400"
+use_sources = true
+sources = [
+    "AHRS.cpp",
+    "ContinuousAngleTracker.cpp",
+    "InertialDataIntegrator.cpp",
+    "OffsetTracker.cpp",
+    "RegisterIO.cpp",
+    "RegisterIOI2C.cpp",
+    "RegisterIOMau.cpp",
+    "RegisterIOSPI.cpp",
+    "SerialIO.cpp",
+]
+
+[tool.robotpy-build.wrappers."navx"]
+name = "navx"
+depends = ["wpilibc", "wpilib_core", "wpiHal"]
+
+sources = [
+    "navx/src/rpy/navx.cpp"
+]
+
+generate = [
+    { AHRS = "AHRS.h" },
+    # { ITimestampedDataSubscriber = "ITimestampedDataSubscriber.h" },
+]
+generation_data = "gen"
+
+[tool.robotpy-build.metadata]
+name = "robotpy-navx"
+description = "Python wrapper for KauaiLabs NavX sensor"
+author = "RobotPy Development Team"
+author_email = "robotpy@googlegroups.com"
+url = "https://github.com/robotpy/robotpy-navx"
+license = "BSD-3-Clause"
+install_requires = [
+    "robotpy-wpilib>=2020.1.2.2,<2021.0.0",
+]
