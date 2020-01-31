@@ -16,13 +16,13 @@ classes:
     methods:
       AHRS:
         overloads:
-          SPI::Port:
-          I2C::Port:
-          SerialPort::Port:
-          SPI::Port, uint8_t:
-          SPI::Port, uint32_t, uint8_t:
-          I2C::Port, uint8_t:
-          SerialPort::Port, AHRS::SerialDataType, uint8_t:
+          frc::SPI::Port:
+          frc::I2C::Port:
+          frc::SerialPort::Port:
+          frc::SPI::Port, uint8_t:
+          frc::SPI::Port, uint32_t, uint8_t:
+          frc::I2C::Port, uint8_t:
+          frc::SerialPort::Port, AHRS::SerialDataType, uint8_t:
       GetPitch:
       GetRoll:
       GetYaw:
