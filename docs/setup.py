@@ -5,7 +5,7 @@
 from setuptools import setup
 import subprocess
 
-package = "robotpy-hal"
+package = "robotpy-navx"
 version = subprocess.check_output(["git", "describe", "--tags"], encoding="utf-8")
 
 setup(
