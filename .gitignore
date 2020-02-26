@@ -12,9 +12,6 @@ __pycache__
 /navx/pkgcfg.py
 /navx/version.py
 
-/docs/_build
-/docs/_sidebar.rst.inc
-
 .cache
 .coverage
 build

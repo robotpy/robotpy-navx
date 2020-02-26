@@ -48,6 +48,8 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -f navx.rst
+	rm -rf navx
 
 html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html

@@ -2,17 +2,15 @@
 NavX API
 ========
 
-NavX Extension Pins
--------------------
-
-.. automodule:: navx.pins
-    :members:
-    :undoc-members:
+This is not installed on the Robot by default. For installation instructions,
+see :ref:`robotpy-navx install docs <install_navx>`.
 
 NavX AHRS Interface
 -------------------
 
-.. automodule:: navx.ahrs
+.. autoclass:: navx.AHRS
     :members:
     :undoc-members:
+    :show-inheritance:
+
     

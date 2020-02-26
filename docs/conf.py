@@ -6,10 +6,6 @@ import os
 
 from os.path import abspath, join, dirname
 
-# Insert module path here
-sys.path.insert(0, abspath(dirname(__file__)))
-sys.path.insert(0, abspath(join(dirname(__file__), "..")))
-
 import navx
 
 # -- RTD configuration ------------------------------------------------
@@ -27,7 +23,13 @@ if rtd_version not in ["stable", "latest"]:
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode", "sphinx.ext.intersphinx"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
+    "robotpy_sphinx.all",
+]
 
 # The suffix of source filenames.
 source_suffix = ".rst"
@@ -37,12 +39,15 @@ master_doc = "index"
 
 # General information about the project.
 project = "robotpy-navx"
-copyright = "2015, RobotPy development team"
+copyright = "2020, RobotPy development team"
 
 intersphinx_mapping = {
-    "wpilib": ("http://robotpy-wpilib.readthedocs.org/en/%s/" % rtd_version, None)
+    "robotpy": ("https://robotpy.readthedocs.io/en/%s/" % rtd_version, None),
+    "wpilib": (
+        "https://robotpy.readthedocs.io/projects/wpilib/en/%s/" % rtd_version,
+        None,
+    ),
 }
-
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
@@ -112,13 +117,17 @@ texinfo_documents = [
 epub_title = "."
 epub_author = "Author"
 epub_publisher = "Author"
-epub_copyright = "2015, Author"
+epub_copyright = "2020, Author"
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ["search.html"]
 
 # -- Custom Document processing ----------------------------------------------
 
-import gensidebar
+from robotpy_sphinx.sidebar import generate_sidebar
 
-gensidebar.generate_sidebar(globals(), "navx")
+generate_sidebar(
+    globals(),
+    "navx",
+    "https://raw.githubusercontent.com/robotpy/docs-sidebar/master/sidebar.toml",
+)

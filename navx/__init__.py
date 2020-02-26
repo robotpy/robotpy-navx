@@ -4,3 +4,5 @@ from . import _init_navx
 from ._navx import AHRS
 
 __all__ = ["AHRS"]
+
+from .version import version as __version__
