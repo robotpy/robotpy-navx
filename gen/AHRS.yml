@@ -608,6 +608,9 @@ classes:
           of the X, Y and X-axis accelerometers.
 
           :returns: accelerometer full scale range in G.
+      Calibrate:
+        doc: |
+          Does nothing
   AHRS::BoardYawAxis:
     shared_ptr: true
     attributes:
