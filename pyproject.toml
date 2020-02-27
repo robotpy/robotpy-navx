@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "robotpy-build>=2020.1.8,<2021.0.0",
+    "robotpy-build>=2020.1.11,<2021.0.0",
     "wpilib>=2020.3.2.0,<2021.0.0",
 ]
 
@@ -25,6 +25,10 @@ sources = [
     "SerialIO.cpp",
     "SimIO.cpp"
 ]
+
+[[tool.robotpy-build.wrappers."navx".maven_lib_download.patches]]
+patch = "navx/src/0001-Fix-C-simulation.patch"
+strip = 4
 
 [tool.robotpy-build.wrappers."navx"]
 name = "navx"
