@@ -6,10 +6,6 @@ inline_code: |
 classes:
   AHRS:
     shared_ptr: true
-    base_qualnames:
-      SendableBase: frc::SendableBase
-      ErrorBase: frc::SendableBase
-      PIDSource: frc::PIDSource
     enums:
       BoardAxis:
       SerialDataType:
