@@ -247,7 +247,8 @@ classes:
           to 2.  This total range (4) can be associated with a unit circle, since
           each circle is comprised of 4 PI Radians.
 
-          For more information on Quaternions and their use, please see this <a href=https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>definition</a>.
+          For more information on Quaternions and their use, please see this
+          `definition <https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>`_.
 
           :returns: Returns the imaginary portion (W) of the quaternion.
       GetQuaternionX:
@@ -260,7 +261,8 @@ classes:
           to 2.  This total range (4) can be associated with a unit circle, since
           each circle is comprised of 4 PI Radians.
 
-          For more information on Quaternions and their use, please see this <a href=https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>description</a>.
+          For more information on Quaternions and their use, please see this
+          `definition <https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>`_.
 
           :returns: Returns the real portion (X) of the quaternion.
       GetQuaternionY:
