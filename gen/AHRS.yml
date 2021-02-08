@@ -6,10 +6,6 @@ inline_code: |
 classes:
   AHRS:
     shared_ptr: true
-    base_qualnames:
-      SendableBase: frc::SendableBase
-      ErrorBase: frc::SendableBase
-      PIDSource: frc::PIDSource
     enums:
       BoardAxis:
       SerialDataType:
@@ -251,7 +247,8 @@ classes:
           to 2.  This total range (4) can be associated with a unit circle, since
           each circle is comprised of 4 PI Radians.
 
-          For more information on Quaternions and their use, please see this <a href=https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>definition</a>.
+          For more information on Quaternions and their use, please see this
+          `definition <https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>`_.
 
           :returns: Returns the imaginary portion (W) of the quaternion.
       GetQuaternionX:
@@ -264,7 +261,8 @@ classes:
           to 2.  This total range (4) can be associated with a unit circle, since
           each circle is comprised of 4 PI Radians.
 
-          For more information on Quaternions and their use, please see this <a href=https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>description</a>.
+          For more information on Quaternions and their use, please see this
+          `definition <https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>`_.
 
           :returns: Returns the real portion (X) of the quaternion.
       GetQuaternionY:
@@ -400,7 +398,7 @@ classes:
 
           If not set, the default adjustment angle is 0 degrees (no adjustment).
 
-          :param adjustment: in degrees (range:  -360 to 360)
+          :param adjustment: Adjustment in degrees (range:  -360 to 360)
       GetAngleAdjustment:
         doc: |
           Returns the currently configured adjustment angle.  See
@@ -530,8 +528,7 @@ classes:
 
           http://navx-mxp.kauailabs.com/navx-mxp/installation/omnimount/
 
-          :returns: The currently-configured board yaw axis/direction as a
-                    tuple of (up, axis). Up can be True/False, axis is 'x', 'y', or 'z')
+          :returns: The currently-configured board yaw axis/direction.
       GetFirmwareVersion:
         doc: |
           Returns the version number of the firmware currently executing

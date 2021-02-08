@@ -1,7 +1,7 @@
 [build-system]
 requires = [
-    "robotpy-build>=2020.4.0,<2021.0.0",
-    "wpilib>=2021.1.2.0,<2022.0.0",
+    "robotpy-build>=2020.6.1,<2021.0.0",
+    "wpilib>=2021.2.2.0,<2022.0.0",
 ]
 
 [tool.robotpy-build]
@@ -11,7 +11,7 @@ base_package = "navx"
 artifact_id = "navx-cpp"
 group_id = "com.kauailabs.navx.frc"
 repo_url = "https://repo1.maven.org/maven2"
-version = "3.1.413"
+version = "4.0.414"
 use_sources = true
 sources = [
     "AHRS.cpp",
@@ -25,10 +25,6 @@ sources = [
     "SerialIO.cpp",
     "SimIO.cpp"
 ]
-
-[[tool.robotpy-build.wrappers."navx".maven_lib_download.patches]]
-patch = "navx/src/0001-Fix-C-simulation.patch"
-strip = 4
 
 [tool.robotpy-build.wrappers."navx"]
 name = "navx"
@@ -52,5 +48,5 @@ author_email = "robotpy@googlegroups.com"
 url = "https://github.com/robotpy/robotpy-navx"
 license = "BSD-3-Clause"
 install_requires = [
-    "wpilib>=2021.1.2.0,<2022.0.0",
+    "wpilib>=2021.2.2.0,<2022.0.0",
 ]
