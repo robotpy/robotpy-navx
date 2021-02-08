@@ -526,8 +526,7 @@ classes:
 
           http://navx-mxp.kauailabs.com/navx-mxp/installation/omnimount/
 
-          :returns: The currently-configured board yaw axis/direction as a
-                    tuple of (up, axis). Up can be True/False, axis is 'x', 'y', or 'z')
+          :returns: The currently-configured board yaw axis/direction.
       GetFirmwareVersion:
         doc: |
           Returns the version number of the firmware currently executing
