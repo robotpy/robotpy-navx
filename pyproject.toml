@@ -11,7 +11,7 @@ base_package = "navx"
 artifact_id = "navx-cpp"
 group_id = "com.kauailabs.navx.frc"
 repo_url = "https://repo1.maven.org/maven2"
-version = "4.0.414"
+version = "4.0.425"
 use_sources = true
 sources = [
     "AHRS.cpp",
