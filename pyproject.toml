@@ -29,7 +29,14 @@ sources = [
 
 [tool.robotpy-build.wrappers."navx"]
 name = "navx"
-depends = ["wpilibc", "wpilib_core", "wpimath_cpp", "wpimath_geometry", "wpiHal"]
+depends = [
+    "wpilibc",
+    "wpilib_core",
+    "wpimath_cpp",
+    "wpimath_geometry",
+    "wpiHal",
+    "wpiutil",
+]
 
 sources = [
     "navx/src/rpy/navx.cpp"
