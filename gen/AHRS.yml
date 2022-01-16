@@ -1,11 +1,16 @@
 ---
 
+extra_includes:
+- wpi/sendable/SendableHelper.h
+
 inline_code: |
   #include <src/rpy/AHRS.cpp.inl>
 
 classes:
   AHRS:
     shared_ptr: true
+    ignored_bases:
+    - wpi::SendableHelper<AHRS>
     enums:
       BoardAxis:
       SerialDataType:
