@@ -1,0 +1,24 @@
+diff -ur orig/AHRS.cpp patched/AHRS.cpp
+--- orig/AHRS.cpp	2022-01-06 14:18:30.000000000 -0500
++++ patched/AHRS.cpp	2022-02-24 00:42:06.632824071 -0500
+@@ -514,6 +514,20 @@
+     SerialInit(serial_port_id, SerialDataType::kProcessedData, NAVX_DEFAULT_UPDATE_RATE_HZ);
+ }
+ 
++AHRS::~AHRS() {
++  io->Stop();
++
++  if (task->joinable()) {
++    task->join();
++  }
++
++  delete integrator;
++  delete yaw_angle_tracker;
++  delete yaw_offset_tracker;
++  delete ahrs_internal;
++  delete io;
++}
++
+ /**
+  * Returns the current pitch value (in degrees, from -180 to 180)
+  * reported by the sensor.  Pitch is a measure of rotation around
