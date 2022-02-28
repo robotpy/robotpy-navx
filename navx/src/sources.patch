@@ -1,0 +1,162 @@
+diff -ur orig/AHRS.cpp patched/AHRS.cpp
+--- orig/AHRS.cpp	2022-01-06 14:18:30.000000000 -0500
++++ patched/AHRS.cpp	2022-02-24 00:42:06.632824071 -0500
+@@ -514,6 +514,20 @@
+     SerialInit(serial_port_id, SerialDataType::kProcessedData, NAVX_DEFAULT_UPDATE_RATE_HZ);
+ }
+ 
++AHRS::~AHRS() {
++  io->Stop();
++
++  if (task->joinable()) {
++    task->join();
++  }
++
++  delete integrator;
++  delete yaw_angle_tracker;
++  delete yaw_offset_tracker;
++  delete ahrs_internal;
++  delete io;
++}
++
+ /**
+  * Returns the current pitch value (in degrees, from -180 to 180)
+  * reported by the sensor.  Pitch is a measure of rotation around
+diff -ur orig/SimIO.cpp patched/SimIO.cpp
+--- orig/SimIO.cpp	2021-07-24 11:57:50.000000000 -0400
++++ patched/SimIO.cpp	2022-02-24 01:31:32.806868996 -0500
+@@ -10,6 +10,9 @@
+ #include "delay.h"
+ #include <units/base.h>
+ 
++#include <frc/Errors.h>
++#include <hal/HALBase.h>
++
+ using namespace frc;
+ using units::unit_cast;
+ 
+@@ -29,6 +32,9 @@
+     board_id        = {};
+ 
+     if (sim_device) {
++        int32_t status = 0;
++        m_notifier = HAL_InitializeNotifier(&status);
++        FRC_CheckErrorStatus(status, "{}", "SimIO initialize notifier");
+             
+         // Booleans
+         
+@@ -146,6 +152,12 @@
+ }
+ 
+ SimIO::~SimIO() {
++    int32_t status = 0;
++    HAL_NotifierHandle handle = m_notifier.exchange(0);
++    HAL_StopNotifier(handle, &status);
++    FRC_ReportError(status, "{}", "~SimIO stop");
++    HAL_CleanNotifier(handle, &status);
++    FRC_ReportError(status, "{}", "~SimIO clean");
+ }
+ 
+ bool SimIO::IsConnected() {
+@@ -174,11 +186,38 @@
+ void SimIO::ZeroDisplacement() {
+ }
+ 
++bool SimIO::Wait(uint64_t us) {
++    int32_t status = 0;
++    HAL_NotifierHandle notifier = m_notifier.load();
++    if (notifier == 0) {
++        return false;
++    }
++
++    uint64_t tm = HAL_GetFPGATime(&status) + us;
++    if (status != 0) {
++        return false;
++    }
++
++    HAL_UpdateNotifierAlarm(notifier, tm, &status);
++    if (status != 0) {
++        return false;
++    }
++
++    uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
++    if (curTime == 0 || status != 0) {
++        return false;
++    }
++
++    return true;
++}
++
+ void SimIO::Run() {
+     /* IO Loop */
+     // Simulate startup delay
+-    delayMillis(50);
+-
++    if (!Wait(50000)) {
++        return;
++    }
++    
+     // Default to connected state
+     is_connected = true;
+     notify_sink->ConnectDetected();
+@@ -195,7 +234,9 @@
+     start_seconds = unit_cast<double>(Timer::GetFPGATimestamp());
+ 
+     while (!stop) {
+-        delayMillis(20);
++        if (!Wait(20000)) {
++            return;
++        }
+         sensor_timestamp += 20;
+         UpdatePeriodicFromSimVariables(sensor_timestamp);            
+     }
+@@ -270,6 +311,12 @@
+ 
+ void SimIO::Stop() {
+     stop = true;
++
++    HAL_NotifierHandle handle = m_notifier.load();
++    if (handle) {
++        int32_t status;
++        HAL_StopNotifier(handle, &status);
++    }
+ }
+ 
+ void SimIO::EnableLogging(bool enable) {
+diff -ur orig/SimIO.h patched/SimIO.h
+--- orig/SimIO.h	2020-04-23 10:31:38.000000000 -0400
++++ patched/SimIO.h	2022-02-24 01:31:20.802783612 -0500
+@@ -9,6 +9,7 @@
+ #define SRC_SIMIO_H_
+ 
+ #include <stdint.h>
++#include <atomic>
+ #include "IIOProvider.h"
+ #include "IMUProtocol.h"
+ #include "AHRSProtocol.h"
+@@ -17,6 +18,7 @@
+ #include "frc/Timer.h"
+ 
+ #include <hal/SimDevice.h>
++#include <hal/Notifier.h>
+ 
+ class SimIO : public IIOProvider {
+ private:
+@@ -47,6 +49,9 @@
+     AHRSProtocol::AHRSPosUpdate ahrs_update;    
+     IMUProtocol::GyroUpdate raw_data_update;
+ 
++    // HAL handle, atomic for proper destruction
++    std::atomic<HAL_NotifierHandle> m_notifier{0};
++
+ public:
+     SimIO( uint8_t update_rate_hz,
+                 IIOCompleteNotification *notify_sink,
+@@ -64,6 +69,7 @@
+ 
+     double GetRate();
+ private:
++    bool Wait(uint64_t us);
+     void UpdatePeriodicFromSimVariables(long sensor_timestamp);
+     float CalculateNormal(float in1, float in2);
+ };
