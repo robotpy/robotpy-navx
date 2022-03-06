@@ -10,7 +10,7 @@ Documentation
 
 * `Installation <http://robotpy.readthedocs.io/en/stable/install/navx.html>`_
 * `Python API Documentation <http://robotpy.readthedocs.io/projects/navx/en/stable/api.html>`_
-* `Examples <https://github.com/robotpy/examples>`_
+* `Examples <https://github.com/robotpy/robotpy-navx/tree/main/examples>`_
 
 License
 =======
