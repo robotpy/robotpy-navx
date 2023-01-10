@@ -22,7 +22,7 @@ install_requires = [
 artifact_id = "navx-frc-cpp"
 group_id = "com.kauailabs.navx.frc"
 repo_url = "https://dev.studica.com/maven/release/2023"
-version = "2023.0.0"
+version = "2023.0.1"
 use_sources = true
 sources = [
     "AHRS.cpp",
