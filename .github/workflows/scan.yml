@@ -10,6 +10,6 @@ jobs:
     if: github.repository_owner	== 'robotpy'
     runs-on: ubuntu-latest
     steps:
-    - uses: robotpy/build-actions/check-for-maven-update@v2021
+    - uses: robotpy/build-actions/check-for-maven-update@v2023
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
