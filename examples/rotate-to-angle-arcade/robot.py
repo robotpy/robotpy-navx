@@ -55,6 +55,7 @@ class MyRobot(wpilib.TimedRobot):
         # Channels for the wheels
         self.l_motor = wpilib.Spark(1)
         self.r_motor = wpilib.Spark(2)
+        self.r_motor.setInverted(True)
 
         self.drive = wpilib.drive.DifferentialDrive(self.l_motor, self.r_motor)
         self.stick = wpilib.Joystick(0)
@@ -95,7 +96,7 @@ class MyRobot(wpilib.TimedRobot):
         driving".
         """
 
-        if self.tm.hasPeriodPassed(1.0):
+        if self.tm.advanceIfElapsed(1.0):
             print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
 
         rotateToAngle = False
@@ -132,7 +133,7 @@ class MyRobot(wpilib.TimedRobot):
         # illustrates one way you could implement this using
         # a 4 wheel drive robot
 
-        self.drive.arcadeDrive(-self.stick.getY(), currentRotationRate)
+        self.drive.arcadeDrive(-self.stick.getY(), -currentRotationRate)
 
 
 if __name__ == "__main__":

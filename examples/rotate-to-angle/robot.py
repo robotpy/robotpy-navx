@@ -63,6 +63,9 @@ class MyRobot(wpilib.TimedRobot):
         self.frontRightMotor = wpilib.Talon(frontRightChannel)
         self.rearRightMotor = wpilib.Talon(rearRightChannel)
 
+        self.frontRightMotor.setInverted(True)
+        self.rearRightMotor.setInverted(True)
+
         self.drive = wpilib.drive.MecanumDrive(
             self.frontLeftMotor,
             self.rearLeftMotor,
@@ -108,7 +111,7 @@ class MyRobot(wpilib.TimedRobot):
         driving".
         """
 
-        if self.tm.hasPeriodPassed(1.0):
+        if self.tm.advanceIfElapsed(1.0):
             print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
 
         rotateToAngle = False
@@ -141,7 +144,9 @@ class MyRobot(wpilib.TimedRobot):
         # calculated rotation rate (or joystick Z axis),
         # depending upon whether "rotate to angle" is active.
         self.drive.driveCartesian(
-            self.stick.getX(), -self.stick.getY(), currentRotationRate, 0
+            self.stick.getY(),
+            -self.stick.getX(),
+            currentRotationRate,
         )
 
 
