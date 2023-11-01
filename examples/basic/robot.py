@@ -13,7 +13,6 @@ def run():
 
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
-
         self.sd = NetworkTables.getTable("SmartDashboard")
 
         self.timer = wpilib.Timer()
