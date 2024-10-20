@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import wpilib
-from networktables import NetworkTables
+from ntcore import NetworkTableInstance
 
 
 import navx
@@ -13,7 +13,7 @@ def run():
 
 class MyRobot(wpilib.TimedRobot):
     def robotInit(self):
-        self.sd = NetworkTables.getTable("SmartDashboard")
+        self.sd = NetworkTableInstance.getDefault().getTable("SmartDashboard")
 
         self.timer = wpilib.Timer()
 
@@ -36,7 +36,7 @@ class MyRobot(wpilib.TimedRobot):
         self.timer.start()
 
     def disabledPeriodic(self):
-        if self.timer.hasPeriodPassed(0.5):
+        if self.timer.advanceIfElapsed(0.5):
             self.sd.putNumber("Displacement X", self.navx.getDisplacementX())
             self.sd.putNumber("Displacement Y", self.navx.getDisplacementY())
             self.sd.putBoolean("IsCalibrating", self.navx.isCalibrating())

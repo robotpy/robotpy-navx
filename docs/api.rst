@@ -2,8 +2,7 @@
 NavX API
 ========
 
-This is not installed on the Robot by default. For installation instructions,
-see :ref:`robotpy-navx install docs <install_navx>`.
+This is not installed on the robot by default.
 
 NavX AHRS Interface
 -------------------

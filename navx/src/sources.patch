@@ -53,7 +53,7 @@ diff -ur orig/SimIO.cpp patched/SimIO.cpp
 +    HAL_NotifierHandle handle = m_notifier.exchange(0);
 +    HAL_StopNotifier(handle, &status);
 +    FRC_ReportError(status, "{}", "~SimIO stop");
-+    HAL_CleanNotifier(handle, &status);
++    HAL_CleanNotifier(handle);
 +    FRC_ReportError(status, "{}", "~SimIO clean");
  }
  
