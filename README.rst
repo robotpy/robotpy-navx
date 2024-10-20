@@ -15,4 +15,4 @@ Documentation
 License
 =======
 
-The original NavX software is available under the MIT license, as is this.
+The oddriginal NavX software is available under the MIT license, as is this.
