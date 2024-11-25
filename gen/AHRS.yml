@@ -3,27 +3,20 @@
 extra_includes:
 - wpi/sendable/SendableHelper.h
 
-inline_code: |
-  #include <src/rpy/AHRS.cpp.inl>
-
 classes:
   AHRS:
-    shared_ptr: true
     ignored_bases:
-    - wpi::SendableHelper<AHRS>
+    - wpi::SendableHelper<studica::AHRS>
     enums:
       BoardAxis:
+      NavXComType:
+      NavXUpdateRate:
       SerialDataType:
     methods:
       AHRS:
         overloads:
-          frc::SPI::Port:
-          frc::I2C::Port:
-          frc::SerialPort::Port:
-          frc::SPI::Port, uint8_t:
-          frc::SPI::Port, uint32_t, uint8_t:
-          frc::I2C::Port, uint8_t:
-          frc::SerialPort::Port, AHRS::SerialDataType, uint8_t:
+          NavXComType:
+          NavXComType, NavXUpdateRate:
       GetPitch:
         doc: |
           Returns the current pitch value (in degrees, from -180 to 180)
@@ -633,3 +626,10 @@ classes:
     attributes:
       board_axis:
       up:
+
+inline_code: |
+  cls_AHRS.def_static("create_spi", []() {
+    return std::make_shared<studica::AHRS>(studica::AHRS::NavXComType::kMXP_SPI);
+  }, release_gil(),
+  "Constructs the AHRS class using SPI communication and default settings.\n"
+  "Use the constructor if you need more customization.");
