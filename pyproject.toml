@@ -1,9 +1,9 @@
 [build-system]
 requires = [
     "robotpy-build<2025.0.0b1,~=2025.0.0a1",
-    "robotpy-wpiutil~=2025.0.0b1",
-    "robotpy-wpimath~=2025.0.0b1",
-    "wpilib~=2025.0.0b1",
+    "robotpy-wpiutil~=2025.0.0b2",
+    "robotpy-wpimath~=2025.0.0b2",
+    "wpilib~=2025.0.0b2",
 ]
 
 [tool.robotpy-build]
@@ -17,48 +17,41 @@ author_email = "robotpy@googlegroups.com"
 url = "https://github.com/robotpy/robotpy-navx"
 license = "BSD-3-Clause"
 install_requires = [
-    "robotpy-wpiutil~=2025.0.0b1",
-    "robotpy-wpimath~=2025.0.0b1",
-    "wpilib~=2025.0.0b1",
+    "robotpy-wpiutil~=2025.0.0b2",
+    "robotpy-wpimath~=2025.0.0b2",
+    "wpilib~=2025.0.0b2",
 ]
 
-[tool.robotpy-build.wrappers."navx".maven_lib_download]
-artifact_id = "navx_frc-cpp"
-group_id = "com.kauailabs.navx.frc"
+[tool.robotpy-build.static_libs."studica_driver".maven_lib_download]
+artifact_id = "Studica-driver"
+group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2025"
-version = "2025.1.1-beta-1"
-use_sources = true
-sources = [
-    "AHRS.cpp",
-    "ContinuousAngleTracker.cpp",
-    "InertialDataIntegrator.cpp",
-    "OffsetTracker.cpp",
-    "RegisterIO.cpp",
-    "RegisterIOI2C.cpp",
-    "RegisterIOMau.cpp",
-    "RegisterIOSPI.cpp",
-    "SerialIO.cpp",
-    "SimIO.cpp",
-    "Tracer.cpp"
-]
+version = "2025.1.1-beta-3"
+libs = ["StudicaDriver"]
 
-[[tool.robotpy-build.wrappers."navx".maven_lib_download.patches]]
-patch = "navx/src/sources.patch"
-strip = 1
-
-[[tool.robotpy-build.wrappers."navx".maven_lib_download.header_patches]]
-patch = "navx/src/ahrs.h.patch"
-strip = 2
+[tool.robotpy-build.static_libs."studica_lib".maven_lib_download]
+artifact_id = "Studica-cpp"
+group_id = "com.studica.frc"
+repo_url = "https://dev.studica.com/maven/release/2025"
+version = "2025.1.1-beta-3"
+libs = ["Studica"]
 
 [tool.robotpy-build.wrappers."navx"]
 name = "navx"
 depends = [
+    "wpilib_core",
+    "wpimath_cpp",
+    "wpimath_geometry",
+    "wpiHal",
     "wpilibc",
     "wpilib_core",
     "wpimath_cpp",
     "wpimath_geometry",
     "wpiHal",
+    "ntcore",
     "wpiutil",
+    "studica_driver",
+    "studica_lib",
 ]
 
 sources = [
@@ -66,7 +59,6 @@ sources = [
 ]
 
 generate = [
-    { AHRS = "AHRS.h" },
-    # { ITimestampedDataSubscriber = "ITimestampedDataSubscriber.h" },
+    { AHRS = "studica/AHRS.h" },
 ]
 generation_data = "gen"
