@@ -9,3 +9,13 @@ def test_get_angle():
 def test_get_rotation2d():
     imu = navx.AHRS.create_spi()
     imu.getRotation2d()
+
+
+def test_get_board_yaw_axis():
+    imu = navx.AHRS.create_spi()
+    imu.getBoardYawAxis()
+
+
+def test_get_velocity_x():
+    imu = navx.AHRS.create_spi()
+    imu.getVelocityX()
