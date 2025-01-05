@@ -1,9 +1,7 @@
 [build-system]
 requires = [
-    "robotpy-build<2025.0.0b1,~=2025.0.0a1",
-    "robotpy-wpiutil~=2025.0.0b2",
-    "robotpy-wpimath~=2025.0.0b2",
-    "wpilib~=2025.0.0b2",
+    "robotpy-build~=2025.0.0",
+    "wpilib<2026,>=2025.1.1",
 ]
 
 [tool.robotpy-build]
@@ -17,23 +15,21 @@ author_email = "robotpy@googlegroups.com"
 url = "https://github.com/robotpy/robotpy-navx"
 license = "BSD-3-Clause"
 install_requires = [
-    "robotpy-wpiutil~=2025.0.0b2",
-    "robotpy-wpimath~=2025.0.0b2",
-    "wpilib~=2025.0.0b2",
+    "wpilib<2026,>=2025.1.1",
 ]
 
 [tool.robotpy-build.static_libs."studica_driver".maven_lib_download]
 artifact_id = "Studica-driver"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2025"
-version = "2025.1.1-beta-3"
+version = "2025.0.0"
 libs = ["StudicaDriver"]
 
 [tool.robotpy-build.static_libs."studica_lib".maven_lib_download]
 artifact_id = "Studica-cpp"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2025"
-version = "2025.1.1-beta-3"
+version = "2025.0.0"
 libs = ["Studica"]
 
 [tool.robotpy-build.wrappers."navx"]
