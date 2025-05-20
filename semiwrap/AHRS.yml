@@ -1,10 +1,9 @@
----
 
 extra_includes:
 - wpi/sendable/SendableHelper.h
 
 classes:
-  AHRS:
+  ::studica::AHRS:
     ignored_bases:
     - wpi::SendableHelper<studica::AHRS>
     enums:
@@ -621,8 +620,7 @@ classes:
       Calibrate:
         doc: |
           Does nothing
-  AHRS::BoardYawAxis:
-    shared_ptr: true
+  ::studica::AHRS::BoardYawAxis:
     attributes:
       board_axis:
       up:
