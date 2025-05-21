@@ -1,3 +1,3 @@
-#include <rpygen_wrapper.hpp>
+#include <semiwrap_init.navx._navx.hpp>
 
-RPYBUILD_PYBIND11_MODULE(m) { initWrapper(m); }
+SEMIWRAP_PYBIND11_MODULE(m) { initWrapper(m); }

@@ -1,4 +1,4 @@
-*.py[cod]
+*.py[codi]
 *.egg-info
 __pycache__
 
@@ -7,12 +7,15 @@ __pycache__
 *.dll
 
 /navx/include
-/navx/rpy-include
-/navx/_init_navx.py
-/navx/pkgcfg.py
+/navx/trampolines
+/navx/_init__navx.py
+/navx/_init_studica_api.py
+/navx/navx.pc
+/navx/studica_api.pc
 /navx/version.py
 
 .cache
 .coverage
 build
 dist
+/lib
