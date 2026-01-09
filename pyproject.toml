@@ -53,6 +53,22 @@ version = "2026.0.0-beta"
 staticlibs = ["StudicaDriver"]
 extract_to = "lib"
 
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "StudicaLib-cpp"
+group_id = "com.studica.frc"
+repo_url = "https://dev.studica.com/maven/release/2026"
+version = "2026.0.1-beta"
+staticlibs = ["StudicaLib"]
+extract_to = "lib"
+
+[[tool.hatch.build.hooks.robotpy.maven_lib_download]]
+artifact_id = "StudicaLib-driver"
+group_id = "com.studica.frc"
+repo_url = "https://dev.studica.com/maven/release/2026"
+version = "2026.0.1-beta"
+staticlibs = ["StudicaLibDriver"]
+extract_to = "lib"
+
 
 [tool.hatch.build.hooks.semiwrap]
 
@@ -61,6 +77,8 @@ extract_to = "lib"
 
 [tool.semiwrap]
 update_init = ["navx"]
+scan_headers_ignore = ["*"]
+
 
 [tool.semiwrap.extension_modules."navx._navx"]
 name = "navx"
@@ -75,3 +93,4 @@ includes = [
 
 [tool.semiwrap.extension_modules."navx._navx".headers]
 AHRS = "studica/AHRS.h"
+NavX = "studica/Navx.h"

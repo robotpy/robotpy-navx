@@ -1,0 +1,22 @@
+classes:
+  ::studica::Navx:
+    methods:
+      Navx:
+        overloads:
+          int:
+          int, int:
+      GetYaw:
+      GetPitch:
+      GetRoll:
+      GetAlgoStates:
+      EnableOptionalMessages:
+      GetQuat6D:
+      GetQuat9D:
+      GetAngularVel:
+      GetLinearAccel:
+      GetCompass:
+      SelfTest:
+      SetODRHz:
+      Start:
+      GetSensorUUID:
+      GetTemperature:
