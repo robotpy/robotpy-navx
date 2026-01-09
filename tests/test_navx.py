@@ -19,3 +19,8 @@ def test_get_board_yaw_axis():
 def test_get_velocity_x():
     imu = navx.AHRS.create_spi()
     imu.getVelocityX()
+
+
+def test_navx_get_yaw():
+    imu = navx.Navx(0)
+    imu.getYaw()

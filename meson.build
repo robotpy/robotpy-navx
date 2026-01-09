@@ -17,7 +17,9 @@ libs_path = meson.current_source_dir() + '/lib/lib'
 
 navx_deps += [
     cpp.find_library('StudicaDriver', dirs: libs_path),
+    cpp.find_library('StudicaLibDriver', dirs: libs_path),
     cpp.find_library('Studica', dirs: libs_path),
+    cpp.find_library('StudicaLib', dirs: libs_path),
 ]
 
 subdir('semiwrap/modules')
