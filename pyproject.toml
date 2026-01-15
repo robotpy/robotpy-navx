@@ -3,10 +3,10 @@ build-backend = "hatchling.build"
 requires = [
     "hatchling",
     "hatch-vcs",
-    "semiwrap~=0.1",
-    "hatch-meson~=0.1.0b2",
-    "hatch-robotpy~=0.2.0",
-    "wpilib~=2026.1.1b1",
+    "semiwrap~=0.2.6",
+    "hatch-meson~=0.1.0",
+    "hatch-robotpy~=0.2.1",
+    "wpilib~=2026.1.1",
 ]
 
 
@@ -16,7 +16,7 @@ dynamic = ["version"]
 description = "Python wrapper for Studica NavX sensor"
 license = "BSD-3-Clause"
 dependencies = [
-    "wpilib~=2026.1.1b1",
+    "wpilib>=2026.1.1,<2027",
 ]
 
 [[project.authors]]
@@ -41,7 +41,7 @@ packages = ["navx"]
 artifact_id = "Studica-cpp"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.0-beta"
+version = "2026.0.0"
 staticlibs = ["Studica"]
 extract_to = "lib"
 
@@ -49,7 +49,7 @@ extract_to = "lib"
 artifact_id = "Studica-driver"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.0-beta"
+version = "2026.0.0"
 staticlibs = ["StudicaDriver"]
 extract_to = "lib"
 
@@ -57,7 +57,7 @@ extract_to = "lib"
 artifact_id = "StudicaLib-cpp"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.1-beta"
+version = "2026.0.1"
 staticlibs = ["StudicaLib"]
 extract_to = "lib"
 
@@ -65,7 +65,7 @@ extract_to = "lib"
 artifact_id = "StudicaLib-driver"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.1-beta"
+version = "2026.0.1"
 staticlibs = ["StudicaLibDriver"]
 extract_to = "lib"
 
