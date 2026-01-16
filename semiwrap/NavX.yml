@@ -1,3 +1,6 @@
+defaults:
+  references_are_out_param: true
+
 classes:
   ::studica::Navx:
     methods:
@@ -17,6 +20,8 @@ classes:
       GetCompass:
       SelfTest:
       SetODRHz:
-      Start:
       GetSensorUUID:
       GetTemperature:
+      GetRotation2D:
+      GetRotation3D:
+      ResetYaw:
