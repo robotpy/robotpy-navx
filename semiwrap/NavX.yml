@@ -8,6 +8,8 @@ classes:
         overloads:
           int:
           int, int:
+          Port:
+          Port, int:
       GetYaw:
       GetPitch:
       GetRoll:
@@ -25,3 +27,7 @@ classes:
       GetRotation2D:
       GetRotation3D:
       ResetYaw:
+      GetAngle:
+      Enable9DYaw:
+    enums:
+      Port:

@@ -57,7 +57,7 @@ extract_to = "lib"
 artifact_id = "StudicaLib-cpp"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.1"
+version = "2026.0.2"
 staticlibs = ["StudicaLib"]
 extract_to = "lib"
 
@@ -65,7 +65,7 @@ extract_to = "lib"
 artifact_id = "StudicaLib-driver"
 group_id = "com.studica.frc"
 repo_url = "https://dev.studica.com/maven/release/2026"
-version = "2026.0.1"
+version = "2026.0.2"
 staticlibs = ["StudicaLibDriver"]
 extract_to = "lib"
 
