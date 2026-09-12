@@ -3,6 +3,12 @@ defaults:
 
 classes:
   ::studica::Navx:
+    doc: |
+      Interface for the Studica NavX3 IMU over CAN or USB.
+
+      Pass an integer device ID for CAN, or a :class:`Navx.Port` value for USB.
+      Both transports support an optional update rate in Hz (default: 100).
+      For older navX sensors, use :class:`AHRS` instead.
     methods:
       Navx:
         overloads:
