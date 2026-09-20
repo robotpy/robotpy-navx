@@ -8,8 +8,20 @@ classes:
         overloads:
           int:
           int, int:
+          # Port implements __index__, so prioritize USB over the int overloads.
+          # Close py::init here; semiwrap's trailing ')' closes py::prepend.
           Port:
+            no_release_gil: false
+            cpp_code: |
+              [](studica::Navx::Port port) {
+                return std::make_unique<studica::Navx>(port);
+              }), py::prepend(
           Port, int:
+            no_release_gil: false
+            cpp_code: |
+              [](studica::Navx::Port port, int updateRate) {
+                return std::make_unique<studica::Navx>(port, updateRate);
+              }), py::prepend(
       GetYaw:
       GetPitch:
       GetRoll:
