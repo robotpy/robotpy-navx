@@ -1,32 +1,41 @@
 robotpy-navx
 ============
 
-This is a python implementation of the kauailabs NavX library.
+Python bindings for StudicaLib 2027.0.0-alpha-1, supporting Studica NavX3
+sensors over CAN and USB.
 
-.. note:: The RobotPy project is not associated with or endorsed by kauailabs or Studica Robotics
+.. note:: The RobotPy project is not associated with or endorsed by kauailabs or Studica Robotics.
 
 Documentation
 =============
 
-* `Installation <http://robotpy.readthedocs.io/en/stable/install/navx.html>`_
-* `Python API Documentation <http://robotpy.readthedocs.io/projects/navx/en/stable/api.html>`_
+* `Installation <https://robotpy.readthedocs.io/en/stable/install/navx.html>`_
+* `Python API Documentation <https://robotpy.readthedocs.io/projects/navx/en/stable/api.html>`_
 * `Examples <https://github.com/robotpy/robotpy-navx/tree/main/examples>`_
 
-NavX3 over USB
-==============
-
-Studica NavX3 sensors use ``navx.Navx`` rather than the older ``navx.AHRS`` API.
-This project includes StudicaLib 2026.0.2, with USB support:
+Quick start
+===========
 
 .. code-block:: python
 
     import navx
 
-    imu = navx.Navx(navx.Navx.Port.kUSB1)  # or kUSB2
-    yaw = imu.getYaw()
+    imu = navx.Navx.usb()  # Discover a NavX3 on any USB port
+    # Alternatively, select a SystemCore USB port:
+    # imu = navx.Navx.usb(navx.UsbPort.USB1)
+    # Or open CAN device ID 0 on CAN_S0:
+    # imu = navx.Navx(0)
 
-Use the ``Port`` enum for USB; passing an integer selects a CAN device ID.
+    yaw = imu.getYaw()  # degrees, or None if unavailable
+    if yaw is not None:
+        print(yaw)
+
+Getters return ``None`` when readings are unavailable, stale, or not enabled
+for streaming. Commands return ``navx.Status``; compare with ``navx.Status.OK``.
 See the `USB example <examples/navx3-usb/robot.py>`_ for a complete robot program.
+
+This release requires RobotPy 2027 and replaces the legacy sensor API. Older
+SPI/I2C sensor interfaces and their simulation examples are no longer included.
 
 License
 =======

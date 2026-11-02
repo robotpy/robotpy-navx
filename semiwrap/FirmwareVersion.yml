@@ -1,0 +1,6 @@
+classes:
+  studica::FirmwareVersion:
+    attributes:
+      major:
+      minor:
+      patch:

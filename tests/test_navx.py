@@ -1,112 +1,168 @@
+import time
+
 import pytest
+import wpilib
 from wpilib.simulation import SimDeviceSim
 
 import navx
 
 
-def test_get_angle():
-    imu = navx.AHRS.create_spi()
-    imu.getAngle()
+def wait_for(predicate):
+    """Wait for Studica's background reader to publish a simulation update."""
+    deadline = time.monotonic() + 2
+    while time.monotonic() < deadline:
+        if predicate():
+            return
+        time.sleep(0.005)
+    assert predicate(), "NavX simulation did not publish the expected update"
 
 
-def test_get_rotation2d():
-    imu = navx.AHRS.create_spi()
-    imu.getRotation2d()
-
-
-def test_get_board_yaw_axis():
-    imu = navx.AHRS.create_spi()
-    imu.getBoardYawAxis()
-
-
-def test_get_velocity_x():
-    imu = navx.AHRS.create_spi()
-    imu.getVelocityX()
-
-
-@pytest.mark.parametrize("device_id", [0, 2, 3])
-@pytest.mark.parametrize("update_rate", [None, 50])
 @pytest.mark.parametrize("use_keywords", [False, True])
-def test_navx_can_constructors(device_id, update_rate, use_keywords):
+@pytest.mark.parametrize("can_id", [0, 2, 3])
+def test_can_constructors(can_id, use_keywords):
     if use_keywords:
-        if update_rate is None:
-            imu = navx.Navx(deviceId=device_id)
-        else:
-            imu = navx.Navx(deviceId=device_id, updateRate=update_rate)
-    elif update_rate is None:
-        imu = navx.Navx(device_id)
+        imu = navx.Navx(canId=can_id, bus=wpilib.CANPort.CAN_S0, updateRateHz=50)
     else:
-        imu = navx.Navx(device_id, update_rate)
+        imu = navx.Navx(can_id, wpilib.CANPort.CAN_S0, 50)
+    assert imu.isOpen()
+    sim = SimDeviceSim(f"NavX3[{can_id}]")
+    sim.get_double("Yaw").set(42.5)
+    sim.get_double("Angle").set(402.5)
+    wait_for(lambda: imu.getYaw() == 42.5 and imu.getAngle() == 402.5)
+    assert imu.getRotation2d().degrees() == pytest.approx(42.5)
 
-    sim = SimDeviceSim(f"NavX3[{device_id}]")
-    sim.getDouble("Yaw").set(42.5)
-    assert imu.getYaw() == pytest.approx(42.5)
+
+@pytest.mark.parametrize("port", list(navx.UsbPort.__members__.values()))
+@pytest.mark.parametrize("use_keywords", [False, True])
+@pytest.mark.parametrize("update_rate", [None, 50])
+def test_usb_port_overload(port, use_keywords, update_rate):
+    if use_keywords:
+        kwargs = {} if update_rate is None else {"updateRateHz": update_rate}
+        imu = navx.Navx.usb(port=port, **kwargs)
+    elif update_rate is None:
+        imu = navx.Navx.usb(port)
+    else:
+        imu = navx.Navx.usb(port, update_rate)
+    # The integer overload instead opens USB-any and treats the port as a rate.
+    sim_name = f"NavX3[USB port {port.value}]"
+    assert sim_name in SimDeviceSim.enumerate_devices()
+    SimDeviceSim(sim_name).get_double("Yaw").set(-12.5)
+    wait_for(lambda: imu.getYaw() == -12.5)
+
+
+@pytest.mark.parametrize("update_rate", [None, 50])
+def test_usb_any(update_rate):
+    imu = navx.Navx.usb() if update_rate is None else navx.Navx.usb(update_rate)
+    SimDeviceSim("NavX3[USB]").get_double("Yaw").set(21.0)
+    wait_for(lambda: imu.getYaw() == 21.0)
+
+
+def test_serial_device():
+    imu = navx.Navx.fromSerialDevice("/dev/robotpy-test-navx", updateRateHz=50)
+    SimDeviceSim("NavX3[/dev/robotpy-test-navx]").get_double("Yaw").set(15.0)
+    wait_for(lambda: imu.getYaw() == 15.0)
+
+
+def test_message_flags():
+    messages = navx.NavxMessage.YAW | navx.NavxMessage.ANGLE
+    assert isinstance(messages, navx.NavxMessage)
+    assert messages.value == 5
+    imu = navx.Navx(0)
+    assert imu.enableMessages(messages) == navx.Status.OK
+
+
+def test_sensor_readings():
+    imu = navx.Navx(0)
+    sim = SimDeviceSim("NavX3[0]")
+    sim.get_double("Pitch").set(12.0)
+    sim.get_double("Roll").set(-8.0)
+    sim.get_double("Angular Velocity X").set(1.5)
+    sim.get_double("Acceleration Y").set(2.5)
+    sim.get_double("Compass Norm").set(35.0)
+    sim.get_double("Temperature").set(26.0)
+    wait_for(lambda: imu.getTemperature() == 26.0)
+    assert imu.getPitch() == 12.0
+    assert imu.getRoll() == -8.0
+    assert imu.getAngularVelocity().x == 1.5
+    assert imu.getLinearAcceleration().y == 2.5
+    assert imu.getMagneticField().norm == 35.0
+    assert isinstance(imu.getAlgorithmState(), navx.AlgorithmState)
+    assert imu.getQuaternion6d().w == 1.0
+    assert imu.getQuaternion9d().w == 1.0
+    assert imu.getRotation3d().x == 0.0
+    assert isinstance(imu.getTimestamp(), float)
+    assert isinstance(imu.isTimeSynced(), bool)
+
+
+@pytest.mark.parametrize("method", ["getFirmwareVersion", "getSensorUuid", "selfTest"])
+def test_expected_results_on_invalid_device(method):
+    imu = navx.Navx(-1)
+    assert getattr(imu, method)() == (navx.Status.INVALID_HANDLE, None)
+
+
+def test_firmware_version():
+    imu = navx.Navx(0)
+    status, firmware = imu.getFirmwareVersion()
+    assert status == navx.Status.OK
+    assert isinstance(firmware, navx.FirmwareVersion)
+    assert (firmware.major, firmware.minor, firmware.patch) == (0, 0, 0)
+
+
+def test_sensor_uuid():
+    imu = navx.Navx(0)
+    assert imu.getSensorUuid() == (navx.Status.OK, [0, 0, 0])
+
+
+def test_self_test():
+    imu = navx.Navx(0)
+    status, result = imu.selfTest()
+    assert status == navx.Status.OK
+    assert isinstance(result, navx.SelfTestResult)
+    assert result.gyro == 1
+    assert result.gyroAxes == [1, 1, 1]
+    assert result.accel == 1
+    assert result.accelAxes == [1, 1, 1]
 
 
 @pytest.mark.parametrize(
-    "port, sim_name",
-    [(navx.Navx.Port.kUSB1, "NavX3[2]"), (navx.Navx.Port.kUSB2, "NavX3[3]")],
+    "method",
+    [
+        "getYaw",
+        "getPitch",
+        "getRoll",
+        "getAngle",
+        "getRotation2d",
+        "getRotation3d",
+        "getQuaternion6d",
+        "getQuaternion9d",
+        "getAngularVelocity",
+        "getLinearAcceleration",
+        "getMagneticField",
+        "getAlgorithmState",
+        "getTemperature",
+        "getTimestamp",
+    ],
 )
-@pytest.mark.parametrize("update_rate", [None, 50])
-@pytest.mark.parametrize("use_keywords", [False, True])
-def test_navx_usb_constructors(port, sim_name, update_rate, use_keywords, monkeypatch):
-    # CAN ID 2/3 and USB port 2/3 have identical simulation device names.
-    # Observe integer coercion without changing it: choosing the CAN overload
-    # would call __index__, whereas the USB overload accepts the enum directly.
-    integer_conversions = []
-    original_index = navx.Navx.Port.__index__
-
-    def track_index(value):
-        integer_conversions.append(value)
-        return original_index(value)
-
-    monkeypatch.setattr(navx.Navx.Port, "__index__", track_index)
-
-    if use_keywords:
-        if update_rate is None:
-            imu = navx.Navx(port=port)
-        else:
-            imu = navx.Navx(port=port, updateRate=update_rate)
-    elif update_rate is None:
-        imu = navx.Navx(port)
-    else:
-        imu = navx.Navx(port, update_rate)
-
-    assert integer_conversions == []
-
-    sim = SimDeviceSim(sim_name)
-    sim.getDouble("Yaw").set(42.5)
-    sim.getDouble("Angle").set(402.5)
-
-    assert imu.getYaw() == pytest.approx(42.5)
-    assert imu.getAngle() == pytest.approx(402.5)
-
-    error, rotation = imu.getRotation2D()
-    assert error is False
-    assert rotation.degrees() == pytest.approx(42.5)
+def test_unavailable_readings(method):
+    imu = navx.Navx(-1)
+    assert not imu.isOpen()
+    assert not imu.isConnected()
+    assert not imu.isTimeSynced()
+    assert getattr(imu, method)() is None
 
 
-@pytest.mark.parametrize("enable", [False, True])
-def test_navx_enable_9d_yaw(enable):
-    imu = navx.Navx(navx.Navx.Port.kUSB1)
-    # Studica returns False on success, not True.
-    assert imu.enable9DYaw(enable) is False
-
-
-def test_navx_optional_angle_messages():
+def test_commands():
     imu = navx.Navx(0)
-    assert (
-        imu.enableOptionalMessages(
-            yaw=True,
-            angle=True,
-            quat6d=False,
-            quat9d=False,
-            algoStates=False,
-            pitchRoll=False,
-            angularVel=False,
-            linearAccel=False,
-            compass=False,
-            temperature=False,
+    assert imu.resetYaw() == navx.Status.OK
+    assert imu.setOutputRate(50) == navx.Status.OK
+    assert imu.use9AxisYaw(True) == navx.Status.OK
+    assert imu.use9AxisYaw(False) == navx.Status.OK
+    assert imu.setOutputRate(0) == navx.Status.INVALID_ARGUMENT
+
+
+def test_can_bus():
+    for mode in (navx.CanBusMode.FD_5MBPS, navx.CanBusMode.CLASSIC):
+        assert (
+            navx.CanBus.requestMode(wpilib.CANPort.CAN_S0, mode, 0.0) == navx.Status.OK
         )
-        is False
-    )
+        assert navx.CanBus.getMode(wpilib.CANPort.CAN_S0) == mode

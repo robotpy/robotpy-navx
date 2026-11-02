@@ -1,45 +1,106 @@
-defaults:
-  references_are_out_param: true
+extra_includes:
+- pybind11/stl.h
+- tuple
 
 classes:
-  ::studica::Navx:
+  studica::AngularVelocity3d:
+    attributes:
+      x:
+      y:
+      z:
+  studica::Acceleration3d:
+    attributes:
+      x:
+      y:
+      z:
+  studica::MagneticField:
+    attributes:
+      x:
+      y:
+      z:
+      norm:
+  studica::AlgorithmState:
+    attributes:
+      gyroBias:
+      atRest:
+      magUndisturbed:
+      magRefNorm:
+      magCandidateNorm:
+      magRefDip:
+      magCandidateDip:
+  studica::SelfTestResult:
+    attributes:
+      gyro:
+      gyroAxes:
+      accel:
+      accelAxes:
+  studica::Navx:
     methods:
       Navx:
         overloads:
+          int, wpi::CANPort, int:
+      Usb:
+        overloads:
           int:
-          int, int:
-          # Port implements __index__, so prioritize USB over the int overloads.
-          # Close py::init here; semiwrap's trailing ')' closes py::prepend.
-          Port:
-            no_release_gil: false
-            cpp_code: |
-              [](studica::Navx::Port port) {
-                return std::make_unique<studica::Navx>(port);
-              }), py::prepend(
-          Port, int:
-            no_release_gil: false
-            cpp_code: |
-              [](studica::Navx::Port port, int updateRate) {
-                return std::make_unique<studica::Navx>(port, updateRate);
-              }), py::prepend(
+          UsbPort, int:
+            # UsbPort implements __index__; match it before the integer rate.
+            binding_order: -1
+      FromSerialDevice:
+      IsOpen:
+      IsConnected:
       GetYaw:
       GetPitch:
       GetRoll:
-      GetAlgoStates:
-      EnableOptionalMessages:
-      GetQuat6D:
-      GetQuat9D:
-      GetAngularVel:
-      GetLinearAccel:
-      GetCompass:
-      SelfTest:
-      SetODRHz:
-      GetSensorUUID:
-      GetTemperature:
-      GetRotation2D:
-      GetRotation3D:
-      ResetYaw:
       GetAngle:
-      Enable9DYaw:
-    enums:
-      Port:
+      GetRotation2d:
+      GetRotation3d:
+      GetQuaternion6d:
+      GetQuaternion9d:
+      GetAngularVelocity:
+      GetLinearAcceleration:
+      GetMagneticField:
+      GetAlgorithmState:
+      GetTemperature:
+      GetTimestamp:
+      IsTimeSynced:
+      ResetYaw:
+      SetOutputRate:
+      EnableMessages:
+      Use9AxisYaw:
+      GetFirmwareVersion:
+        no_release_gil: false
+        doc_append: |
+          :returns: A (status, firmware) tuple. Firmware is None on failure.
+        cpp_code: |
+          [](studica::Navx &self) -> std::tuple<studica::Status, std::optional<studica::FirmwareVersion>> {
+            auto result = self.GetFirmwareVersion();
+            if (!result) return {result.error(), std::nullopt};
+            return {studica::Status::OK, *result};
+          }
+      GetSensorUuid:
+        no_release_gil: false
+        doc_append: |
+          :returns: A (status, uuid) tuple. UUID is None on failure.
+        cpp_code: |
+          [](studica::Navx &self) -> std::tuple<studica::Status, std::optional<std::array<uint32_t, 3>>> {
+            auto result = self.GetSensorUuid();
+            if (!result) return {result.error(), std::nullopt};
+            return {studica::Status::OK, *result};
+          }
+      SelfTest:
+        no_release_gil: false
+        doc_append: |
+          :returns: A (status, result) tuple. Result is None on failure.
+        cpp_code: |
+          [](studica::Navx &self) -> std::tuple<studica::Status, std::optional<studica::SelfTestResult>> {
+            auto result = self.SelfTest();
+            if (!result) return {result.error(), std::nullopt};
+            return {studica::Status::OK, *result};
+          }
+enums:
+  NavxMessage:
+    doc: "Message groups the NavX3 can stream. Combine with ``|``."
+    inline_code: |
+      .def("__or__", [](studica::NavxMessage a, studica::NavxMessage b) {
+        return a | b;
+      }, py::is_operator())

@@ -1,0 +1,7 @@
+enums:
+  CanBusMode:
+classes:
+  studica::CanBus:
+    methods:
+      RequestMode:
+      GetMode:
