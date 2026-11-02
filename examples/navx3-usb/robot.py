@@ -1,23 +1,34 @@
 #!/usr/bin/env python3
+"""Publish NavX3 USB readings with RobotPy 2027."""
 
 import navx
 import wpilib
+from ntcore import NetworkTableInstance
 
 
 class MyRobot(wpilib.TimedRobot):
-    def robotInit(self):
-        # NavX3 uses Navx; AHRS is for older navX sensors.
-        # Use kUSB2 for the other USB port. An integer selects CAN instead.
-        self.imu = navx.Navx(navx.Navx.Port.kUSB1)
-        # Optional update rate in Hz (default: 100):
-        # self.imu = navx.Navx(navx.Navx.Port.kUSB1, 50)
+    def __init__(self):
+        super().__init__()
+        self.table = NetworkTableInstance.get_default().get_table("NavX3")
+        self.imu = navx.Navx.usb()  # Discover a single sensor on any USB port
+        # For multiple sensors, select a SystemCore port for each:
+        # self.imu = navx.Navx.usb(navx.UsbPort.USB1, updateRateHz=50)
+        # Or select an explicit serial device:
+        # self.imu = navx.Navx.fromSerialDevice("/dev/ttyACM0")
 
-    def robotPeriodic(self):
+    def robot_periodic(self):
+        self.table.put_boolean("Connected", self.imu.isConnected())
         # Yaw is wrapped to +/-180 degrees; angle is continuous.
-        # On a read error, yaw is 360 and angle is NaN.
-        wpilib.SmartDashboard.putNumber("NavX3/Yaw", self.imu.getYaw())
-        wpilib.SmartDashboard.putNumber("NavX3/Angle", self.imu.getAngle())
+        for name, reading in (
+            ("Yaw", self.imu.getYaw()),
+            ("Angle", self.imu.getAngle()),
+        ):
+            # Getters return None while data is missing, disabled, or stale.
+            self.table.put_boolean(f"{name}Valid", reading is not None)
+            self.table.put_number(
+                name, reading if reading is not None else float("nan")
+            )
 
 
 if __name__ == "__main__":
-    wpilib.run(MyRobot)
+    wpilib.TimedRobot.main(MyRobot)
